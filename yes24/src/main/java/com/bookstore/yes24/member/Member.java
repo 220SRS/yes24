@@ -1,5 +1,4 @@
-package com.bookstore.yes24.book;
-
+package com.bookstore.yes24.member;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,22 +8,25 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-public class Book {
-
+public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookId;
+    private Long memberId;
 
-    private String title;
+    private String memberName;
 
-    private String author;
+    private String nickName;
 
-    private Integer price;
+    private LocalDate birthDate;
 
-    private Integer quantity;
+    private String email;
+
+    private String phone;
 }

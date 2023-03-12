@@ -1,14 +1,15 @@
 package com.bookstore.yes24.book;
 
 
+import com.bookstore.yes24.order.OrderBook;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -27,4 +28,8 @@ public class Book {
     private Integer price;
 
     private Integer quantity;
+
+
+    @OneToMany(mappedBy = "book")
+    private List<OrderBook> orderBookList = new ArrayList<>();
 }

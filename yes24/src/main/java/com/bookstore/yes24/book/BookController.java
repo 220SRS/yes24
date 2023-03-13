@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -63,7 +64,7 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity createBook(@RequestBody BookCreateDto bookCreateDto) {
+    public ResponseEntity createBook(@Valid @RequestBody BookCreateDto bookCreateDto) {
 
         Book book = bookService.creatBook(
                 bookMapper.BookcreatDtoToBook(bookCreateDto)

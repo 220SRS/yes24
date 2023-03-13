@@ -15,7 +15,7 @@ public class OrderResponseDto {
 
     private Long orderId;
 
-    private List<BookResponseDto> bookList;
+    private List<OrderBookResponseDto> orderBookResponseDtoList;
 
     private OrderStatus orderStatus;
 

@@ -1,5 +1,6 @@
 package com.bookstore.yes24.member;
 
+import com.bookstore.yes24.member.dto.MemberUpdateDto;
 import com.bookstore.yes24.order.Order;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @NoArgsConstructor
@@ -32,7 +34,23 @@ public class Member {
 
     private String phone;
 
-
-    @OneToMany(mappedBy = "member")
+    // JPA N+1
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Order> orderList = new ArrayList<>();
+
+    // dto, 하나씩 받는 경우
+    public void update(MemberUpdateDto dto) {
+        if (dto.getMemberId() != null)
+            memberId = dto.getMemberId();
+
+        // TODO
+        memberName = dto.getMemberName();
+
+        nickName = dto.getNickName();
+
+        email = dto.getEmail();
+
+        phone = dto.getPhone();
+
+    }
 }

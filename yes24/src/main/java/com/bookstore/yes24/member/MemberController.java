@@ -67,12 +67,10 @@ public class MemberController {
                 HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{member-id}")
-    public ResponseEntity updateMember(@PathVariable("member-id") Long memberId,
-                                       @RequestBody MemberUpdateDto memberUpdateDto) {
+    @PatchMapping
+    public ResponseEntity updateMember(@RequestBody MemberUpdateDto memberUpdateDto) {
 
-        Member updateMember = memberService.updateMember(memberId,
-                memberMapper.memberUpdateDtoToMember(memberUpdateDto));
+        Member updateMember = memberService.updateMember(memberUpdateDto);
 
         return new ResponseEntity<>(memberMapper.memberToMemberResponseDto(updateMember),
                 HttpStatus.OK);

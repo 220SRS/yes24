@@ -1,9 +1,11 @@
 package com.bookstore.yes24.member;
 
+import com.bookstore.yes24.member.dto.MemberUpdateDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -37,25 +39,13 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    public Member updateMember(Long memberId, Member member) {
-        Member findMember = memberRepository.findById(memberId).orElseThrow(NullPointerException::new);
+    @Transactional
+    public Member updateMember(MemberUpdateDto dto) {
+        Member findMember = memberRepository.findById(dto.getMemberId()).orElseThrow(NullPointerException::new);
 
-        Optional.ofNullable(member.getMemberName())
-                .ifPresent(findMember::setMemberName);
-
-        Optional.ofNullable(member.getNickName())
-                .ifPresent(findMember::setNickName);
-
-        Optional.ofNullable(member.getBirthDate())
-                .ifPresent(findMember::setBirthDate);
-
-        Optional.ofNullable(member.getEmail())
-                .ifPresent(findMember::setEmail);
-
-        Optional.ofNullable(member.getPhone())
-                .ifPresent(findMember::setPhone);
-
-        return memberRepository.save(findMember);
+        // update via dirty checking
+        findMember.update(dto);
+        return findMember;
     }
 
     public void deleteMember(Long memberId) {

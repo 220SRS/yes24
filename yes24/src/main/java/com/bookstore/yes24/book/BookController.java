@@ -1,6 +1,7 @@
 package com.bookstore.yes24.book;
 
 import com.bookstore.yes24.book.dto.BookCreateDto;
+import com.bookstore.yes24.book.dto.BookResponseDto;
 import com.bookstore.yes24.book.dto.BookUpdateDto;
 import com.bookstore.yes24.pageResponse.MultiResponseDto;
 import org.springframework.http.HttpStatus;
@@ -51,46 +52,26 @@ public class BookController {
     }
 
     @GetMapping("/author/{author}")
-    public ResponseEntity authorBookList(@PathVariable("author") String author,
+    public ResponseEntity<List<BookResponseDto>> authorBookList(@PathVariable("author") String author,
                                          @RequestParam int page,
                                          @RequestParam int size) {
-        Page<Book> pageBookList = bookService.findAuthorBookList(author,page - 1, size);
-        List<Book> BookList = pageBookList.getContent();
 
-        return new ResponseEntity<>(
-                new MultiResponseDto<>(bookMapper.BookToBookResponseDtoList(BookList), pageBookList),
-                HttpStatus.OK
-        );
+        return ResponseEntity.ok(bookService.findAuthorBookList(author, page - 1, size));
     }
 
     @PostMapping
-    public ResponseEntity createBook(@Valid @RequestBody BookCreateDto bookCreateDto) {
-
-        Book book = bookService.creatBook(
-                bookMapper.BookcreatDtoToBook(bookCreateDto)
-        );
-
-        return new ResponseEntity<>(bookMapper.BookToBookResponseDto(book),
-                HttpStatus.CREATED);
+    public ResponseEntity<BookResponseDto> createBook(@Valid @RequestBody BookCreateDto bookCreateDto) {
+        return ResponseEntity.ok(bookService.creatBook(bookCreateDto));
     }
 
-    @PatchMapping("/{book-id}")
-    public ResponseEntity updateBook(@PathVariable("book-id") Long bookId,
-                                     @RequestBody BookUpdateDto bookUpdateDto) {
-        bookUpdateDto.setBookId(bookId);
-
-        Book book = bookMapper.BookupdateDtoToBook(bookUpdateDto);
-
-        Book responseBook = bookService.updateBook(book);
-
-        return new ResponseEntity<>(bookMapper.BookToBookResponseDto(responseBook), HttpStatus.OK);
+    @PatchMapping
+    public ResponseEntity<BookResponseDto> updateBook(@RequestBody BookUpdateDto bookUpdateDto) {
+        return ResponseEntity.ok(bookService.updateBook(bookUpdateDto));
     }
 
     @DeleteMapping("/{book-id}")
-    public ResponseEntity deleteBook(@PathVariable("book-id") Long bookId) {
-
+    public ResponseEntity<Void> deleteBook(@PathVariable("book-id") Long bookId) {
         bookService.deleteBook(bookId);
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(null);
     }
 }

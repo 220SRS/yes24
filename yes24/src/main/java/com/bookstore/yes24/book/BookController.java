@@ -1,16 +1,16 @@
 package com.bookstore.yes24.book;
 
 import com.bookstore.yes24.book.dto.BookCreateDto;
+import com.bookstore.yes24.book.dto.BookResponseDto;
 import com.bookstore.yes24.book.dto.BookUpdateDto;
 import com.bookstore.yes24.pageResponse.MultiResponseDto;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.data.domain.Page;
+
 
 import javax.validation.Valid;
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/books")
@@ -18,79 +18,56 @@ public class BookController {
 
     private final BookService bookService;
 
-    private final BookMapper bookMapper;
 
-    public BookController(BookService bookService, BookMapper bookMapper) {
+    public BookController(BookService bookService) {
         this.bookService = bookService;
-        this.bookMapper = bookMapper;
     }
 
     @GetMapping("/{book-id}")
-    public ResponseEntity findBook(@PathVariable("book-id") Long bookId) {
-        Book findBook = bookService.findBook(bookId);
+    public ResponseEntity<BookResponseDto> findBook(@PathVariable("book-id") Long bookId) {
+        BookResponseDto bookResponseDto = bookService.findBook(bookId);
 
-        return new ResponseEntity<>(bookMapper.BookToBookResponseDto(findBook), HttpStatus.OK);
+        return ResponseEntity.ok(bookResponseDto);
     }
 
     @GetMapping("/bookTitle/{book-title}")
-    public ResponseEntity findBookTitle(@PathVariable("book-title") String bookTitle) {
-        Book findBook = bookService.findBookTitle(bookTitle);
+    public ResponseEntity<BookResponseDto> findBookTitle(@PathVariable("book-title") String bookTitle) {
+        BookResponseDto bookResponseDto = bookService.findBookTitle(bookTitle);
 
-        return new ResponseEntity<>(bookMapper.BookToBookResponseDto(findBook), HttpStatus.OK);
+        return ResponseEntity.ok(bookResponseDto);
     }
 
     @GetMapping
-    public ResponseEntity BookList(@RequestParam int page, @RequestParam int size) {
-        Page<Book> pageBookList = bookService.findBookList(page - 1, size);
-        List<Book> BookList = pageBookList.getContent();
+    public ResponseEntity<MultiResponseDto<BookResponseDto>> BookList(@RequestParam int page, @RequestParam int size) {
 
-        return new ResponseEntity<>(
-                new MultiResponseDto<>(bookMapper.BookToBookResponseDtoList(BookList), pageBookList),
-                HttpStatus.OK
-        );
+        MultiResponseDto<BookResponseDto> multiResponseDto = bookService.findBookList(page - 1, size);
+
+        return ResponseEntity.ok(multiResponseDto);
     }
 
     @GetMapping("/author/{author}")
-    public ResponseEntity authorBookList(@PathVariable("author") String author,
+    public ResponseEntity<MultiResponseDto<BookResponseDto>> authorBookList(@PathVariable("author") String author,
                                          @RequestParam int page,
                                          @RequestParam int size) {
-        Page<Book> pageBookList = bookService.findAuthorBookList(author,page - 1, size);
-        List<Book> BookList = pageBookList.getContent();
 
-        return new ResponseEntity<>(
-                new MultiResponseDto<>(bookMapper.BookToBookResponseDtoList(BookList), pageBookList),
-                HttpStatus.OK
-        );
+        MultiResponseDto<BookResponseDto> multiResponseDto = bookService.findAuthorBookList(author, page - 1, size);
+
+        return ResponseEntity.ok(multiResponseDto);
     }
 
     @PostMapping
-    public ResponseEntity createBook(@Valid @RequestBody BookCreateDto bookCreateDto) {
-
-        Book book = bookService.creatBook(
-                bookMapper.BookcreatDtoToBook(bookCreateDto)
-        );
-
-        return new ResponseEntity<>(bookMapper.BookToBookResponseDto(book),
-                HttpStatus.CREATED);
+    public ResponseEntity<BookResponseDto> createBook(@Valid @RequestBody BookCreateDto bookCreateDto) {
+        return ResponseEntity.ok(bookService.createBook(bookCreateDto));
     }
 
-    @PatchMapping("/{book-id}")
-    public ResponseEntity updateBook(@PathVariable("book-id") Long bookId,
-                                     @RequestBody BookUpdateDto bookUpdateDto) {
-        bookUpdateDto.setBookId(bookId);
-
-        Book book = bookMapper.BookupdateDtoToBook(bookUpdateDto);
-
-        Book responseBook = bookService.updateBook(book);
-
-        return new ResponseEntity<>(bookMapper.BookToBookResponseDto(responseBook), HttpStatus.OK);
+    @PatchMapping
+    public ResponseEntity<BookResponseDto> updateBook(@RequestBody BookUpdateDto bookUpdateDto) {
+        return ResponseEntity.ok(bookService.updateBook(bookUpdateDto));
     }
 
     @DeleteMapping("/{book-id}")
-    public ResponseEntity deleteBook(@PathVariable("book-id") Long bookId) {
-
+    public ResponseEntity<Void> deleteBook(@PathVariable("book-id") Long bookId) {
         bookService.deleteBook(bookId);
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(null);
     }
 }

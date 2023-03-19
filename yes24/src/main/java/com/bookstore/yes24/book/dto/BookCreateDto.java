@@ -17,6 +17,7 @@ public class BookCreateDto {
 //        @Pattern(regexp = "^[ㄱ-ㅎ가-힣]{1,17}$", message = "영어 또는 한글로만 작성해야 합니다")
 //    })
     @MultiRegExp
+
     @Size(max = 30, message = "작가명은 한 글자 이상이거나 30글자 이하여야 합니다")
     @NotBlank
     private String author;

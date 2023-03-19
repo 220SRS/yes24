@@ -35,9 +35,9 @@ public class OrderFactory {
                                 OrderBook orderBook = new OrderBook();
                                 orderBook.setQuantity(orderBookDto.getQuantity());
                                 orderBook.setOrder(order);
-                                orderBook.setBook(
-                                        bookService.findBook(orderBookDto.getBookId())
-                                );
+//                                orderBook.setBook(
+//                                        bookService.findBook(orderBookDto.getBookId())
+//                                );
                                 orderBookList.add(orderBook);
                             });
 

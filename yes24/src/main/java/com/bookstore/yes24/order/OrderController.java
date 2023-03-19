@@ -1,9 +1,5 @@
 package com.bookstore.yes24.order;
 
-import com.bookstore.yes24.book.Book;
-import com.bookstore.yes24.book.BookMapper;
-import com.bookstore.yes24.book.BookRepository;
-import com.bookstore.yes24.book.dto.BookResponseDto;
 import com.bookstore.yes24.order.dto.OrderCreateDto;
 import com.bookstore.yes24.order.dto.OrderUpdateDto;
 import com.bookstore.yes24.pageResponse.MultiResponseDto;
@@ -13,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/orders")
@@ -25,13 +20,11 @@ public class OrderController {
 
     private final OrderFactory orderFactory;
 
-    private final BookMapper bookMapper;
 
-    public OrderController(OrderService orderService, OrderMapper orderMapper, OrderFactory orderFactory, BookMapper bookMapper) {
+    public OrderController(OrderService orderService, OrderMapper orderMapper, OrderFactory orderFactory) {
         this.orderService = orderService;
         this.orderMapper = orderMapper;
         this.orderFactory = orderFactory;
-        this.bookMapper = bookMapper;
     }
 
     @GetMapping("/{order-id}")

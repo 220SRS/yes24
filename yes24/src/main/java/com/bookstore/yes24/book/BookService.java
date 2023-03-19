@@ -1,65 +1,92 @@
 package com.bookstore.yes24.book;
 
+import com.bookstore.yes24.book.dto.BookCreateDto;
+import com.bookstore.yes24.book.dto.BookResponseDto;
+import com.bookstore.yes24.book.dto.BookUpdateDto;
+import com.bookstore.yes24.pageResponse.MultiResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @Service
 public class BookService {
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
 
     public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
 
-    public Book findBook(Long bookId) {
-        return bookRepository.findById(bookId).orElseThrow(NullPointerException::new);
+    public BookResponseDto findBook(Long bookId) {
+
+        Book book = bookRepository.findById(bookId).orElseThrow(IllegalArgumentException::new);
+
+        return BookResponseDto.of(book);
     }
 
-    public Book findBookTitle(String bookTitle) {
-        return bookRepository.findByTitle(bookTitle).orElseThrow(NullPointerException::new);
+    public BookResponseDto findBookTitle(String bookTitle) {
+
+        Book book = bookRepository.findByTitle(bookTitle).orElseThrow(NullPointerException::new);
+
+        return BookResponseDto.of(book);
     }
 
-    public Page<Book> findBookList(int page, int size) {
-        return bookRepository.findAll(PageRequest.of(page,size,
+    public MultiResponseDto<BookResponseDto> findBookList(int page, int size) {
+
+        Page<Book> bookPage = bookRepository.findAll(PageRequest.of(page,size,
                 Sort.by("bookId").descending()));
+
+        List<Book> bookList = bookPage.getContent();
+
+        List<BookResponseDto> bookResponseDtoList = bookList.stream()
+                .map(BookResponseDto::of)
+                .collect(Collectors.toList());
+
+        return new MultiResponseDto<BookResponseDto>(bookResponseDtoList, bookPage);
     }
 
-    public Page<Book> findAuthorBookList(String author, int page, int size) {
-        return bookRepository.findByAuthor(author, PageRequest.of(page,size,
+    public MultiResponseDto<BookResponseDto> findAuthorBookList(String author, int page, int size) {
+        Page<Book> bookPage = bookRepository.findByAuthor(author, PageRequest.of(page,size,
                 Sort.by("bookId").descending()));
+
+        List<Book> bookList = bookPage.getContent();
+
+        List<BookResponseDto> bookResponseDtoList = bookList.stream()
+                .map(BookResponseDto::of)
+                .collect(Collectors.toList());
+
+        return new MultiResponseDto<BookResponseDto>(bookResponseDtoList, bookPage);
     }
 
-    public Book creatBook(Book book) {
-        return bookRepository.save(book);
+
+    @Transactional
+    public BookResponseDto createBook(BookCreateDto bookCreateDto) {
+
+        Book book = Book.of(bookCreateDto);
+
+        bookRepository.save(book);
+
+        return BookResponseDto.of(book);
     }
 
-    public Book updateBook(Book book) {
 
-        Book findBook = bookRepository.findById(book.getBookId()).orElseThrow(NullPointerException::new);
+    @Transactional
+    public BookResponseDto updateBook(BookUpdateDto bookUpdateDto) {
 
-        Optional.ofNullable(book.getTitle())
-                .ifPresent(title -> findBook.setTitle(title));
-        Optional.ofNullable(book.getAuthor())
-                .ifPresent(author -> findBook.setAuthor(author));
-        Optional.ofNullable(book.getPrice())
-                .filter(price -> price != 0)
-                .ifPresent(price -> findBook.setPrice(price));
-        Optional.ofNullable(book.getQuantity())
-                .filter(price -> price != 0)
-                .ifPresent(quantity -> findBook.setQuantity(quantity));
+        Book findbook = bookRepository.findById(bookUpdateDto.getBookId()).orElseThrow(IllegalAccessError::new);
 
-        return bookRepository.save(findBook);
+        findbook.update(bookUpdateDto);
+
+        return BookResponseDto.of(findbook);
     }
 
     public void deleteBook(Long bookId) {
         bookRepository.deleteById(bookId);
     }
-
-
 }

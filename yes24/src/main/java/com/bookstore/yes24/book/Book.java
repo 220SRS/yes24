@@ -4,6 +4,7 @@ package com.bookstore.yes24.book;
 import com.bookstore.yes24.book.dto.BookCreateDto;
 import com.bookstore.yes24.book.dto.BookUpdateDto;
 import com.bookstore.yes24.order.OrderBook;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,9 +16,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Entity
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Book {
 
     @Id
@@ -49,18 +50,20 @@ public class Book {
 
     public void update(BookUpdateDto bookUpdateDto) {
 
-        Optional.ofNullable(bookUpdateDto.getAuthor())
-                .ifPresent(this::setAuthor);
+        if (bookUpdateDto.getTitle() != null) {
+            this.setTitle(bookUpdateDto.getTitle());
+        }
 
-        Optional.ofNullable(bookUpdateDto.getTitle())
-                .ifPresent(this::setTitle);
+        if (bookUpdateDto.getAuthor() != null) {
+            this.setAuthor(bookUpdateDto.getAuthor());
+        }
 
-        Optional.of(bookUpdateDto.getPrice())
-                .filter(price -> price != 0)
-                .ifPresent(this::setPrice);
+        if (bookUpdateDto.getPrice() != 0) {
+            this.setPrice(bookUpdateDto.getPrice());
+        }
 
-        Optional.of(bookUpdateDto.getQuantity())
-                .filter(quantity -> quantity != 0)
-                .ifPresent(this::setQuantity);
+        if (bookUpdateDto.getQuantity() != 0) {
+            this.setQuantity(bookUpdateDto.getQuantity());
+        }
     }
 }

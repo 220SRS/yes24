@@ -32,7 +32,7 @@ public class BookService {
 
     public BookResponseDto findBookTitle(String bookTitle) {
 
-        Book book = bookRepository.findByTitle(bookTitle).orElseThrow(NullPointerException::new);
+        Book book = bookRepository.findByTitle(bookTitle).orElseThrow(IllegalArgumentException::new);
 
         return BookResponseDto.of(book);
     }
@@ -44,11 +44,7 @@ public class BookService {
 
         List<Book> bookList = bookPage.getContent();
 
-        List<BookResponseDto> bookResponseDtoList = bookList.stream()
-                .map(BookResponseDto::of)
-                .collect(Collectors.toList());
-
-        return new MultiResponseDto<BookResponseDto>(bookResponseDtoList, bookPage);
+        return new MultiResponseDto<>(BookResponseDto.ofList(bookList), bookPage);
     }
 
     public MultiResponseDto<BookResponseDto> findAuthorBookList(String author, int page, int size) {
@@ -57,11 +53,7 @@ public class BookService {
 
         List<Book> bookList = bookPage.getContent();
 
-        List<BookResponseDto> bookResponseDtoList = bookList.stream()
-                .map(BookResponseDto::of)
-                .collect(Collectors.toList());
-
-        return new MultiResponseDto<BookResponseDto>(bookResponseDtoList, bookPage);
+        return new MultiResponseDto<>(BookResponseDto.ofList(bookList), bookPage);
     }
 
 
@@ -88,5 +80,9 @@ public class BookService {
 
     public void deleteBook(Long bookId) {
         bookRepository.deleteById(bookId);
+    }
+
+    public Book findBookEntity(Long bookId) {
+        return bookRepository.findById(bookId).orElseThrow(IllegalAccessError::new);
     }
 }

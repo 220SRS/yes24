@@ -2,14 +2,15 @@ package com.bookstore.yes24.member;
 
 
 import com.bookstore.yes24.member.dto.MemberCreateDto;
+import com.bookstore.yes24.member.dto.MemberCreateResponseDto;
+import com.bookstore.yes24.member.dto.MemberResponseDto;
 import com.bookstore.yes24.member.dto.MemberUpdateDto;
 import com.bookstore.yes24.pageResponse.MultiResponseDto;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.constraints.Null;
+
 
 @RestController
 @RequestMapping("/members")
@@ -17,72 +18,59 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    private final MemberMapper memberMapper;
-
-    public MemberController(MemberService memberService, MemberMapper memberMapper) {
+    public MemberController(MemberService memberService) {
         this.memberService = memberService;
-        this.memberMapper = memberMapper;
     }
 
     @GetMapping("/{member-id}")
-    public ResponseEntity getMember(@PathVariable("member-id") Long memberId) {
+    public ResponseEntity<MemberResponseDto> getMember(@PathVariable("member-id") Long memberId) {
 
-        Member member = memberService.findMember(memberId);
+        MemberResponseDto memberResponseDto = memberService.findMember(memberId);
 
-        return new ResponseEntity<>(memberMapper.memberToMemberResponseDto(member),
-                HttpStatus.OK);
+        return ResponseEntity.ok(memberResponseDto);
     }
 
     @GetMapping("/memberName/{member-name}")
-    public ResponseEntity getMemberName(@PathVariable("member-name") String memberName,
+    public ResponseEntity<MultiResponseDto<MemberResponseDto>> getMemberName(@PathVariable("member-name") String memberName,
                                         @RequestParam int page,
                                         @RequestParam int size) {
-        Page<Member> pageMemberNameList = memberService.findMemberNameList(memberName, page-1, size);
-        List<Member> memberNameList = pageMemberNameList.getContent();
 
-        return new ResponseEntity<>(
-                new MultiResponseDto<>(memberMapper.memberListToMemberResponseDtoList(memberNameList), pageMemberNameList),
-                HttpStatus.OK);
+        MultiResponseDto<MemberResponseDto> multiResponseDto = memberService.findMemberNameList(memberName, page, size);
+
+        return ResponseEntity.ok(multiResponseDto);
     }
 
     @GetMapping
-    public ResponseEntity getMemberName(@RequestParam int page,
+    public ResponseEntity<MultiResponseDto<MemberResponseDto>> getMemberList(@RequestParam int page,
                                         @RequestParam int size) {
-        Page<Member> pageMemberList = memberService.findMemberList(page-1, size);
-        List<Member> memberList = pageMemberList.getContent();
 
-        return new ResponseEntity<>(
-                new MultiResponseDto<>(memberMapper.memberListToMemberResponseDtoList(memberList), pageMemberList
-                        ),HttpStatus.OK);
+        MultiResponseDto<MemberResponseDto> multiResponseDto = memberService.findMemberList(page, size);
+
+        return ResponseEntity.ok(multiResponseDto);
     }
 
     @PostMapping
-    public ResponseEntity creataMember(@RequestBody MemberCreateDto memberCreateDto) {
+    public ResponseEntity<MemberCreateResponseDto> creataMember(@RequestBody MemberCreateDto memberCreateDto) {
 
-        Member member = memberService.createMember(
-                memberMapper.memberCreateDtoToMember(memberCreateDto)
-        );
+        MemberCreateResponseDto memberCreateResponseDto = memberService.createMember(memberCreateDto);
 
-        return new ResponseEntity<>(memberMapper.memberToMemberResponseDto(member),
-                HttpStatus.CREATED);
+        return ResponseEntity.ok(memberCreateResponseDto);
     }
 
-    @PatchMapping("/{member-id}")
-    public ResponseEntity updateMember(@PathVariable("member-id") Long memberId,
-                                       @RequestBody MemberUpdateDto memberUpdateDto) {
+    @PatchMapping
+    public ResponseEntity<MemberCreateResponseDto> updateMember(@RequestBody MemberUpdateDto memberUpdateDto) {
 
-        Member updateMember = memberService.updateMember(memberId,
-                memberMapper.memberUpdateDtoToMember(memberUpdateDto));
+        MemberCreateResponseDto memberCreateResponseDto = memberService.updateMember(memberUpdateDto);
 
-        return new ResponseEntity<>(memberMapper.memberToMemberResponseDto(updateMember),
-                HttpStatus.OK);
+        return ResponseEntity.ok(memberCreateResponseDto);
     }
 
     @DeleteMapping("/{member-id}")
-    public ResponseEntity deleteMember(@PathVariable("member-id") Long memberId) {
+    public ResponseEntity<Null> deleteMember(@PathVariable("member-id") Long memberId) {
+
         memberService.deleteMember(memberId);
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(null);
     }
 
 }

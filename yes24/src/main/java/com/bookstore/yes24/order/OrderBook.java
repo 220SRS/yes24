@@ -1,6 +1,7 @@
 package com.bookstore.yes24.order;
 
 import com.bookstore.yes24.book.Book;
+import com.bookstore.yes24.order.dto.OrderBookDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class OrderBook {
     @ManyToOne
     @JoinColumn(name = "ORDER_ID")
     private Order order;
+
 
     public void setBook(Book book) {
         this.book = book;

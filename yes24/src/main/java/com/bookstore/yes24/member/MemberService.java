@@ -70,7 +70,10 @@ public class MemberService {
         return MemberCreateResponseDto.of(findMember);
     }
 
+
+    @Transactional
     public void deleteMember(Long memberId) {
+
         memberRepository.deleteById(memberId);
     }
 }

@@ -1,45 +1,99 @@
 package com.bookstore.yes24.order;
 
+import com.bookstore.yes24.book.Book;
+import com.bookstore.yes24.book.BookRepository;
+import com.bookstore.yes24.member.Member;
+import com.bookstore.yes24.member.MemberRepository;
+import com.bookstore.yes24.order.dto.OrderBookDto;
+import com.bookstore.yes24.order.dto.OrderCreateDto;
+import com.bookstore.yes24.order.dto.OrderUpdateDto;
+import com.bookstore.yes24.order.dto.response.OrderResponseDto;
+import com.bookstore.yes24.pageResponse.MultiResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class OrderService {
 
+    private final MemberRepository memberRepository;
+
     private final OrderRepository orderRepository;
 
-    public OrderService(OrderRepository orderRepository) {
+    private final BookRepository bookRepository;
+
+    public OrderService(MemberRepository memberRepository, OrderRepository orderRepository, BookRepository bookRepository) {
+        this.memberRepository = memberRepository;
         this.orderRepository = orderRepository;
+        this.bookRepository = bookRepository;
     }
 
-    public Order findOrder(Long orderId) {
-        return orderRepository.findById(orderId).orElseThrow(NullPointerException::new);
+    public OrderResponseDto findOrder(Long orderId) {
+
+        Order order = orderRepository.findById(orderId).orElseThrow(IllegalAccessError::new);
+
+        return OrderResponseDto.of(order);
     }
 
-    public Page<Order> findOrderList(int page, int size) {
-        return orderRepository.findAll(PageRequest.of(page, size, Sort.by("orderId").descending()));
+    public MultiResponseDto<OrderResponseDto> findOrderList(int page, int size) {
+
+        Page<Order> orderPage = orderRepository.findAll(PageRequest.of(page, size, Sort.by("orderId").descending()));
+        List<Order> orderList = orderPage.getContent();
+
+        return new MultiResponseDto<>(OrderResponseDto.ofList(orderList), orderPage);
     }
 
-    public Order createOrder(Order order) {
-        return orderRepository.save(order);
+
+    @Transactional
+    public OrderResponseDto createOrder(OrderCreateDto orderCreateDto) {
+
+        Order order = new Order();
+
+        Member member =  memberRepository.findById(orderCreateDto.getMemberId()).orElseThrow(IllegalAccessError::new);
+        order.setMember(member);
+
+
+        List<OrderBook> orderBooks = new ArrayList<>();
+
+        for (OrderBookDto orderBookDto : orderCreateDto.getOrderBookList()) {
+            OrderBook orderBook = new OrderBook();
+
+            Book book = bookRepository.findById(orderBookDto.getBookId()).orElseThrow(IllegalAccessError::new);
+
+            orderBook.setBook(book);
+            orderBook.setQuantity(orderBookDto.getQuantity());
+            orderBook.setOrder(order);
+
+            orderBooks.add(orderBook);
+        }
+
+        order.getOrderBooks().addAll(orderBooks);
+
+        member.getOrderList().add(order);
+
+        orderRepository.save(order);
+
+        return OrderResponseDto.of(order);
     }
 
+    @Transactional
+    public OrderResponseDto updateOrder(OrderUpdateDto orderUpdateDto) {
 
-    public Order updateOrder(Long orderId, Order order) {
-        Order findOrder = orderRepository.findById(orderId).orElseThrow(NullPointerException::new);
+        Order findOrder = orderRepository.findById(orderUpdateDto.getOrderId()).orElseThrow(IllegalAccessError::new);
 
-        Optional.ofNullable(order.getOrderStatus())
-                .ifPresent(orderStatus -> findOrder.setOrderStatus(orderStatus));
+        findOrder.setOrderStatus(orderUpdateDto.getOrderStatus());
 
-        return orderRepository.save(findOrder);
+        return OrderResponseDto.of(findOrder);
+
     }
 
+    @Transactional
     public void deleteOrder(Long orderId) {
         orderRepository.deleteById(orderId);
     }
-
 }

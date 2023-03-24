@@ -36,7 +36,7 @@ public class Member {
     private String phone;
 
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Order> orderList = new ArrayList<>();
 
     public static Member of(MemberCreateDto memberCreateDto) {

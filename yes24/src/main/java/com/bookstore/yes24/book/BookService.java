@@ -78,11 +78,8 @@ public class BookService {
         return BookResponseDto.of(findbook);
     }
 
+    @Transactional
     public void deleteBook(Long bookId) {
         bookRepository.deleteById(bookId);
-    }
-
-    public Book findBookEntity(Long bookId) {
-        return bookRepository.findById(bookId).orElseThrow(IllegalAccessError::new);
     }
 }

@@ -22,9 +22,9 @@ public enum OrderStatus {
 
 
     @Getter
-    private int stepNumber;
+    private final int stepNumber;
 
     @Getter
-    private String stepDescription;
+    private final String stepDescription;
 
 }

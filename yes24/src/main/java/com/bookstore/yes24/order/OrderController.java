@@ -1,14 +1,13 @@
 package com.bookstore.yes24.order;
 
 import com.bookstore.yes24.order.dto.OrderCreateDto;
+import com.bookstore.yes24.order.dto.response.OrderResponseDto;
 import com.bookstore.yes24.order.dto.OrderUpdateDto;
 import com.bookstore.yes24.pageResponse.MultiResponseDto;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.constraints.Null;
 
 @RestController
 @RequestMapping("/orders")
@@ -16,55 +15,49 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    private final OrderMapper orderMapper;
 
-    private final OrderFactory orderFactory;
-
-
-    public OrderController(OrderService orderService, OrderMapper orderMapper, OrderFactory orderFactory) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
-        this.orderMapper = orderMapper;
-        this.orderFactory = orderFactory;
     }
 
     @GetMapping("/{order-id}")
-    public ResponseEntity getOrder(@PathVariable("order-id") Long orderId) {
-        Order findOrder = orderService.findOrder(orderId);
+    public ResponseEntity<OrderResponseDto> getOrder(@PathVariable("order-id") Long orderId) {
 
-        return new ResponseEntity(orderMapper.orderToOrderResponseDto(findOrder), HttpStatus.OK);
+        OrderResponseDto orderResponseDto = orderService.findOrder(orderId);
+
+        return ResponseEntity.ok(orderResponseDto);
     }
 
     @GetMapping
-    public ResponseEntity getOrderList(@RequestParam int page, @RequestParam int size) {
-        Page<Order> pageOrderList = orderService.findOrderList(page-1, size);
-        List<Order> orderList = pageOrderList.getContent();
+    public ResponseEntity<MultiResponseDto<OrderResponseDto>> getOrderList(@RequestParam int page, @RequestParam int size) {
 
-        return new ResponseEntity(
-                new MultiResponseDto<>(orderMapper.orderListToOrderResponseDtoList(orderList), pageOrderList),
-                HttpStatus.OK
-        );
+        MultiResponseDto<OrderResponseDto> multiResponseDto = orderService.findOrderList(page-1,size);
+
+        return ResponseEntity.ok(multiResponseDto);
     }
 
 
     @PostMapping
-    public ResponseEntity createOrder(@RequestBody OrderCreateDto orderCreateDto) {
-        Order order = orderService.createOrder(orderFactory.assemblingTheOrder(orderCreateDto));
+    public ResponseEntity<OrderResponseDto> createOrder(@RequestBody OrderCreateDto orderCreateDto) {
 
-        return new ResponseEntity(orderMapper.orderToOrderResponseDto(order), HttpStatus.CREATED);
+        OrderResponseDto orderResponseDto = orderService.createOrder(orderCreateDto);
+
+        return ResponseEntity.ok(orderResponseDto);
     }
 
-    @PatchMapping("/{order-id}")
-    public ResponseEntity updateOrder(@PathVariable("order-id") Long orderId,
-                                      @RequestBody OrderUpdateDto orderUpdateDto){
-        Order updateOrder = orderService.updateOrder(orderId, orderMapper.orderUpdateDtoToOrder(orderUpdateDto));
+    @PatchMapping
+    public ResponseEntity<OrderResponseDto> updateOrder(@RequestBody OrderUpdateDto orderUpdateDto){
 
-        return new ResponseEntity(orderMapper.orderToOrderResponseDto(updateOrder), HttpStatus.OK);
+        OrderResponseDto orderResponseDto = orderService.updateOrder(orderUpdateDto);
+
+        return ResponseEntity.ok(orderResponseDto);
     }
 
     @DeleteMapping("/{order-id}")
-    public ResponseEntity deleteOrder(@PathVariable("order-id") Long orderId) {
+    public ResponseEntity<Null> deleteOrder(@PathVariable("order-id") Long orderId) {
+
         orderService.deleteOrder(orderId);
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(null);
     }
 }

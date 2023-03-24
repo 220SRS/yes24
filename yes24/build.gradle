@@ -33,6 +33,9 @@ dependencies {
 
 	//유효성검증
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	//주문번호를 위한 RandomStringUtils.randomAlphanumeric를 사용해서 랜덤생성
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
 }
 
 tasks.named('test') {

@@ -35,7 +35,7 @@ public class MemberController {
                                         @RequestParam int page,
                                         @RequestParam int size) {
 
-        MultiResponseDto<MemberResponseDto> multiResponseDto = memberService.findMemberNameList(memberName, page, size);
+        MultiResponseDto<MemberResponseDto> multiResponseDto = memberService.findMemberNameList(memberName, page-1, size);
 
         return ResponseEntity.ok(multiResponseDto);
     }
@@ -44,7 +44,7 @@ public class MemberController {
     public ResponseEntity<MultiResponseDto<MemberResponseDto>> getMemberList(@RequestParam int page,
                                         @RequestParam int size) {
 
-        MultiResponseDto<MemberResponseDto> multiResponseDto = memberService.findMemberList(page, size);
+        MultiResponseDto<MemberResponseDto> multiResponseDto = memberService.findMemberList(page-1, size);
 
         return ResponseEntity.ok(multiResponseDto);
     }

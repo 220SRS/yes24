@@ -3,16 +3,10 @@ package com.bookstore.yes24.member;
 import com.bookstore.yes24.member.dto.MemberCreateDto;
 import com.bookstore.yes24.member.dto.MemberUpdateDto;
 import com.bookstore.yes24.order.Order;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,17 +21,20 @@ public class Member {
 
     private String memberName;
 
+    @Column(unique = true)
     private String nickName;
 
     private LocalDate birthDate;
 
+    @Column(unique = true)
     private String email;
 
+    @Column(unique = true)
     private String phone;
-
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Order> orderList = new ArrayList<>();
+
 
     public static Member of(MemberCreateDto memberCreateDto) {
 

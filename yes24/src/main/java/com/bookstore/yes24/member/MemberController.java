@@ -9,6 +9,7 @@ import com.bookstore.yes24.pageResponse.MultiResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Null;
 
 
@@ -50,7 +51,7 @@ public class MemberController {
     }
 
     @PostMapping
-    public ResponseEntity<MemberCreateResponseDto> creataMember(@RequestBody MemberCreateDto memberCreateDto) {
+    public ResponseEntity<MemberCreateResponseDto> creataMember(@Valid @RequestBody MemberCreateDto memberCreateDto) {
 
         MemberCreateResponseDto memberCreateResponseDto = memberService.createMember(memberCreateDto);
 

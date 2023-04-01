@@ -26,9 +26,15 @@ public class MemberService {
 
     public MemberResponseDto findMember(Long memberId) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(IllegalAccessError::new);
+        Member member = memberRepository.findById(memberId).orElseThrow(IllegalArgumentException::new);
 
         return MemberResponseDto.of(member);
+    }
+    public Member findMemberEntity(Long memberId) {
+
+        Member member = memberRepository.findById(memberId).orElseThrow(IllegalArgumentException::new);
+
+        return member;
     }
 
     public MultiResponseDto<MemberResponseDto> findMemberNameList(String memberName, int page, int size) {
@@ -64,7 +70,7 @@ public class MemberService {
     @Transactional
     public MemberCreateResponseDto updateMember(MemberUpdateDto memberUpdateDto) {
 
-        Member findMember = memberRepository.findById(memberUpdateDto.getMemberId()).orElseThrow(IllegalAccessError::new);
+        Member findMember = memberRepository.findById(memberUpdateDto.getMemberId()).orElseThrow(IllegalArgumentException::new);
 
         findMember.update(memberUpdateDto);
 

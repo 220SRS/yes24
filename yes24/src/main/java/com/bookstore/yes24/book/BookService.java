@@ -71,7 +71,7 @@ public class BookService {
     @Transactional
     public BookResponseDto updateBook(BookUpdateDto bookUpdateDto) {
 
-        Book findbook = bookRepository.findById(bookUpdateDto.getBookId()).orElseThrow(IllegalAccessError::new);
+        Book findbook = bookRepository.findById(bookUpdateDto.getBookId()).orElseThrow(IllegalArgumentException::new);
 
         findbook.update(bookUpdateDto);
 

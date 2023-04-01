@@ -48,6 +48,12 @@ public class Member {
         return member;
     }
 
+    public static Member memberWithIdOnly(Long memberId) {
+        Member member = new Member();
+        member.setMemberId(memberId);
+        return member;
+    }
+
     public void update(MemberUpdateDto memberUpdateDto) {
 
         if (memberUpdateDto.getMemberName() != null) {

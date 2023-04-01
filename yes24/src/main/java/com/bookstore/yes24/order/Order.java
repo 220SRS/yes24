@@ -5,6 +5,7 @@ import com.bookstore.yes24.member.MemberRepository;
 import com.bookstore.yes24.order.dto.OrderBookDto;
 import com.bookstore.yes24.order.dto.OrderCreateDto;
 import com.bookstore.yes24.order.dto.OrderUpdateDto;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,9 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "ORDERS")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Setter
 public class Order {
 
     @Id
@@ -37,4 +37,13 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderBook> orderBooks = new ArrayList<>();
 
+    public static Order of(Member member, OrderCreateDto orderCreateDto) {
+        Order order = new Order();
+        order.setMember(member);
+        OrderBook.of(order, orderCreateDto.getOrderBookList());
+    }
+
+    private void setMember(Member member) {
+        this.member = member;
+    }
 }
